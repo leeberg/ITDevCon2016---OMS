@@ -1,0 +1,2 @@
+2016-10-08 12:14:44 --- This is my Custom Log Entry!
+2016-10-08 12:15:12 --- System Is Failing!

@@ -1,0 +1,109 @@
+
+
+#EVENTS
+Type=Event
+Type=Event TimeGenerated>NOW-5HOURS
+
+Type=Event EventLog="Windows PowerShell" 
+is identical to this query
+
+Type=Event AND EventLog="Windows PowerShell"
+
+
+Type:Event NOT(EventLog:"Windows PowerShell")
+
+or (equivalent)
+
+Type=Event EventLog!="Windows PowerShell" 
+
+
+Type=Event EventLog="Windows PowerShell" Computer=BERG1 AND Computer=LEE-NUC1
+
+Type=Event EventLog="Windows PowerShell" Computer=BERG1 OR Computer=LEE-NUC1
+
+
+OPERATORS
+with datetime and numeric fields, you can also search for values GREATER THAN, LESSER THAN OR EQUAL, etc – we use the simple operators  >, < , >=, <= , != for this.
+
+EventLog=System TimeGenerated>NOW-24HOURS
+
+Type=ConfigurationAlert  Severity>=1
+
+Type=Event EventLog="Operations Manager" EventID:[2100..2199]
+
+
+# MEASURING
+Measure allows you to apply statistical functions to your data and aggregate results ‘grouped by’ a given field. There are multiple statistical functions that Measure supports. 
+
+* Type=Event 
+* Type=Event | measure count() by EventLevelName
+Type=Event | Measure count() by Computer
+
+
+# INTERVAL 
+* | measure count() by TimeGenerated interval 1HOUR
+
+Type=ConfigurationChange ConfigChangeType=Software | Measure count() by Computer
+Type=ConfigurationChange ConfigChangeType=Software | measure count() by TimeGenerated interval 1HOUR
+
+
+Type=SecurityEvent EventID=560 OR EventID=567 OR EventID=4656 OR EventID=4663 | Select Computer, Activity, TimeGenerated, EventData
+
+Type=SecurityEvent | measure count() by Activity
+
+Type=SecurityEvent Activity="4907 - Auditing settings on object were changed." | measure count() by Computer
+
+#SELECTING
+Type=SecurityEvent Activity="4907 - Auditing settings on object were changed." | Select TimeGenerated, Activity, Computer, EventData
+
+
+
+
+#PERF DATA
+
+Type=Perf
+
+Type=Perf Computer=LEE-NUC1
+
+#datetime and numeric fields, you can also search for values GREATER THAN, LESSER THAN OR EQUAL, etc – we use the simple operators  >, < , >=, <= , != 
+
+Type=Perf Computer=LEE-NUC1 TimeGenerated > 2016-10-10T10:06:57.403Z
+
+Type=Perf Computer=LEE-NUC1 TimeGenerated > 2016-10-10T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space"
+
+Type=Perf Computer=LEE-NUC1 TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space"
+
+
+# Sorting
+Type=Perf TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" | Sort Computer desc
+Type=Perf TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" | Sort Computer ASC
+
+
+LIMIT
+Type=Perf TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" | TOP 15
+
+
+Measure MAX
+Type=Perf TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" | measure Max(CounterValue) by Computer
+Type=Perf | Measure Max(TimeGenerated) by Computer
+Measure MIN
+Type=Perf ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" | measure Min(CounterValue) by Computer
+
+AVG
+Type=Perf Computer=LEE-NUC1 TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" TimeGenerated>NOW-4HOURS  | Measure Avg(CounterValue) by CounterName
+
+Type=Perf TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" TimeGenerated>NOW-24HOURS   | Measure Avg(CounterValue) by Computer,CounterName
+
+
+WHERE
+Where works like a filter, but it can be applied in the pipeline to further filter ‘aggregated’ results that have been produced by a Measure command – as opposed to ‘raw’ results that get filtered at the beginning of a query.
+
+Type=Perf TimeGenerated > 2016-10-03T10:06:57.403Z ObjectName=LogicalDisk InstanceName="C:" CounterName="% Free Space" TimeGenerated>NOW-24HOURS   | Measure Avg(CounterValue) by Computer,CounterName | WHERE AggregatedValue < 10
+
+
+
+
+
+Azure Activitiy Logs
+DataType = AzureActivity
+SourceSystem=Azure

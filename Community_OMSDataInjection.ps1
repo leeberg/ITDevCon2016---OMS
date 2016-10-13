@@ -8,6 +8,7 @@ $UTCTimeStampField = 'LogTime'
 $Now = [Datetime]::UtcNow
 $ISONow = "{0:yyyy-MM-ddThh:mm:ssZ}" -f $now
 #Change the OMSWorkspaceId
+$OMSWorkSpaceId = "b811a"  
 $PrimaryKey = "T++IA10p9VN0gr9vMVskbA=="
 $SecondaryKey = "afFQtt/vHm0tciRufg=="
 
